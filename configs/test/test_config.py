@@ -1,11 +1,19 @@
 exp_name = 'test_config'
 
 model = dict(
-    type='TestNet',
+    type='Test',
     body=dict(
-        type='TestModel'
+        type='TestNet'
     ),
     mse_loss=dict(type='MSELoss', loss_weight=1.0),
+    perc_loss=dict(
+        type='PerceptualLoss',
+        layer_weights={'34': 1.0},
+        vgg_type='vgg19',
+        perceptual_weight=0.1,
+        style_weight=0,
+        norm_img=False
+    )
 )
 
 # model training and testing settings

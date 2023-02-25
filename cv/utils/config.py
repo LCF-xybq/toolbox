@@ -74,23 +74,6 @@ class Config:
     It supports common file formats as configs: python/json/yaml. The interface
     is the same as a dict object and also allows access config values as
     attributes.
-
-    Example:
-        >>> cfg = Config(dict(a=1, b=dict(b1=[0, 1])))
-        >>> cfg.a
-        1
-        >>> cfg.b
-        {'b1': [0, 1]}
-        >>> cfg.b.b1
-        [0, 1]
-        >>> cfg = Config.fromfile('tests/data/config/a.py')
-        >>> cfg.filename
-        "/home/kchen/projects/mmcv/tests/data/config/a.py"
-        >>> cfg.item4
-        'test'
-        >>> cfg
-        "Config [path: /home/kchen/projects/mmcv/tests/data/config/a.py]: "
-        "{'item1': [1, 2], 'item2': {'a': 0}, 'item3': True, 'item4': 'test'}"
     """
 
     @staticmethod
@@ -181,8 +164,8 @@ class Config:
         filename = osp.abspath(osp.expanduser(filename))
         check_file_exist(filename)
         fileExtname = osp.splitext(filename)[1]
-        if fileExtname not in ['.py', '.json', '.yaml', '.yml']:
-            raise OSError('Only py/yml/yaml/json type are supported now!')
+        if fileExtname not in '.py':
+            raise OSError('Only py is supported now!')
 
         with tempfile.TemporaryDirectory() as temp_config_dir:
             temp_config_file = tempfile.NamedTemporaryFile(
@@ -216,8 +199,7 @@ class Config:
                 # delete imported module
                 del sys.modules[temp_module_name]
             elif filename.endswith(('.yml', '.yaml', '.json')):
-                import mmcv
-                cfg_dict = mmcv.load(temp_config_file.name)
+                pass
             # close temp file
             temp_config_file.close()
 
@@ -559,43 +541,6 @@ class Config:
         super().__setattr__('_filename', _filename)
         super().__setattr__('_text', _text)
 
-    def dump(self, file=None):
-        """Dumps config into a file or returns a string representation of the
-        config.
-
-        If a file argument is given, saves the config to that file using the
-        format defined by the file argument extension.
-
-        Otherwise, returns a string representing the config. The formatting of
-        this returned string is defined by the extension of `self.filename`. If
-        `self.filename` is not defined, returns a string representation of a
-         dict (lowercased and using ' for strings).
-
-        Examples:
-            >>> cfg_dict = dict(item1=[1, 2], item2=dict(a=0),
-            ...     item3=True, item4='test')
-            >>> cfg = Config(cfg_dict=cfg_dict)
-            >>> dump_file = "a.py"
-            >>> cfg.dump(dump_file)
-
-        Args:
-            file (str, optional): Path of the output file where the config
-                will be dumped. Defaults to None.
-        """
-        import mmcv
-        cfg_dict = super().__getattribute__('_cfg_dict').to_dict()
-        if file is None:
-            if self.filename is None or self.filename.endswith('.py'):
-                return self.pretty_text
-            else:
-                file_format = self.filename.split('.')[-1]
-                return mmcv.dump(cfg_dict, file_format=file_format)
-        elif file.endswith('.py'):
-            with open(file, 'w', encoding='utf-8') as f:
-                f.write(self.pretty_text)
-        else:
-            file_format = file.split('.')[-1]
-            return mmcv.dump(cfg_dict, file=file, file_format=file_format)
 
     def merge_from_dict(self, options, allow_list_keys=True):
         """Merge list into cfg_dict.
