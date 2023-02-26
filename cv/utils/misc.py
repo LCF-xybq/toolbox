@@ -1,14 +1,25 @@
-import collections.abc
+import os
+import re
 import functools
 import itertools
 import subprocess
 import warnings
+import os.path as osp
+import collections.abc
+
+from typing import Union
+from pathlib import Path
 from collections import abc
 from importlib import import_module
 from inspect import getfullargspec
 from itertools import repeat
 from packaging.version import parse
 
+def mkdir_or_exist(dir_name, mode=0o777):
+    if dir_name == '':
+        return
+    dir_name = osp.expanduser(dir_name)
+    os.makedirs(dir_name, mode=mode, exist_ok=True)
 
 # From PyTorch internals
 def _ntuple(n):
@@ -400,3 +411,92 @@ def digit_version(version_str: str, length: int = 4):
     else:
         release.extend([0, 0])
     return tuple(release)
+
+def _format_path(path: str) -> str:
+    return re.sub(r'\\+', '/', path)
+
+def byte_stream_get(filepath: Union[str, Path]) -> bytes:
+    """reads the file as a byte stream
+        hard disk only!
+    """
+    filepath = _format_path(filepath)
+    with open(filepath, 'rb') as f:
+        value_buf = f.read()
+    return value_buf
+
+def byte_stream_put(obj: bytes, filepath: Union[str, Path]) -> None:
+    """reads the file as a byte stream
+        hard disk only!
+    """
+    mkdir_or_exist(osp.dirname(filepath))
+    with open(filepath, 'wb') as f:
+        f.write(obj)
+
+def byte_stream_get_text(filepath: Union[str, Path], encoding: str = 'utf-8') -> str:
+    with open(filepath, encoding=encoding) as f:
+        value_buf = f.read()
+    return value_buf
+
+def byte_stream_put_text(obj: str, filepath: Union[str, Path], encoding: str = 'utf-8') -> None:
+    mkdir_or_exist(osp.dirname(filepath))
+    with open(filepath, 'w', encoding=encoding) as f:
+        f.write(obj)
+
+def remove(self, filepath: Union[str, Path]) -> None:
+    """Remove a file.
+
+    Args:
+        filepath (str or Path): Path to be removed.
+    """
+    os.remove(filepath)
+
+def exists(self, filepath: Union[str, Path]) -> bool:
+    """Check whether a file path exists.
+
+    Args:
+        filepath (str or Path): Path to be checked whether exists.
+
+    Returns:
+        bool: Return ``True`` if ``filepath`` exists, ``False`` otherwise.
+    """
+    return osp.exists(filepath)
+
+def isdir(self, filepath: Union[str, Path]) -> bool:
+    """Check whether a file path is a directory.
+
+    Args:
+        filepath (str or Path): Path to be checked whether it is a
+            directory.
+
+    Returns:
+        bool: Return ``True`` if ``filepath`` points to a directory,
+        ``False`` otherwise.
+    """
+    return osp.isdir(filepath)
+
+def isfile(self, filepath: Union[str, Path]) -> bool:
+    """Check whether a file path is a file.
+
+    Args:
+        filepath (str or Path): Path to be checked whether it is a file.
+
+    Returns:
+        bool: Return ``True`` if ``filepath`` points to a file, ``False``
+        otherwise.
+    """
+    return osp.isfile(filepath)
+
+def join_path(self, filepath: Union[str, Path],
+              *filepaths: Union[str, Path]) -> str:
+    """Concatenate all file paths.
+
+    Join one or more filepath components intelligently. The return value
+    is the concatenation of filepath and any members of *filepaths.
+
+    Args:
+        filepath (str or Path): Path to be concatenated.
+
+    Returns:
+        str: The result of concatenation.
+    """
+    return osp.join(filepath, *filepaths)

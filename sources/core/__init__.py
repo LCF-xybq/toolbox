@@ -1,6 +1,9 @@
-from .evaluation import mse, psnr, ssim
+from .evaluation import (DistEvalIterHook, EvalIterHook,
+                         mse, psnr, ssim)
+from .optimizer import build_optimizers
 
 
 __all__ = [
-    'mse', 'psnr', 'ssim',
+    'DistEvalIterHook', 'EvalIterHook',
+    'mse', 'psnr', 'ssim', 'build_optimizers'
 ]

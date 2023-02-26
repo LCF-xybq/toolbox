@@ -120,7 +120,7 @@ configs_ceph/
 configs_ceph_*/
 /data/
 /data
-mmedit/.mim
+sources/.mim
 demo/*.png
 *.csv
 out/*.png

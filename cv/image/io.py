@@ -1,14 +1,12 @@
-import re
 import cv2
 import warnings
 import numpy as np
 import os.path as osp
 
-from typing import Union
 from pathlib import Path
 from cv2 import (IMREAD_COLOR, IMREAD_GRAYSCALE, IMREAD_IGNORE_ORIENTATION,
                  IMREAD_UNCHANGED)
-from cv.utils import is_filepath, is_str, mkdir_or_exist
+from cv.utils import is_filepath, is_str, byte_stream_get, byte_stream_put
 
 try:
     from turbojpeg import TJCS_RGB, TJPF_BGR, TJPF_GRAY, TurboJPEG
@@ -53,26 +51,6 @@ def _jpegflag(flag='color', channel_order='bgr'):
         return TJPF_GRAY
     else:
         raise ValueError('flag must be "color" or "grayscale"')
-
-def _format_path(path: str) -> str:
-    return re.sub(r'\\+', '/', path)
-
-def byte_stream_get(filepath: Union[str, Path]) -> bytes:
-    """reads the file as a byte stream
-        hard disk only!
-    """
-    filepath = _format_path(filepath)
-    with open(filepath, 'rb') as f:
-        value_buf = f.read()
-    return value_buf
-
-def byte_stream_put(obj: bytes, filepath: Union[str, Path]) -> None:
-    """reads the file as a byte stream
-        hard disk only!
-    """
-    mkdir_or_exist(filepath)
-    with open(filepath, 'wb') as f:
-        f.write(obj)
 
 def imread(img_or_path,
            flag='color',

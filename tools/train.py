@@ -1,5 +1,6 @@
 import os
 import time
+import copy
 import torch
 import argparse
 import os.path as osp
@@ -9,7 +10,7 @@ from cv.utils import (Config, DictAction, mkdir_or_exist,
                       get_logger, collect_env)
 from cv.runner import init_dist
 from sources.utils import setup_multi_processes
-from sources.apis import init_random_seed, set_random_seed
+from sources.apis import init_random_seed, set_random_seed, train_model
 from sources.models import build_model
 from sources.datasets import build_dataset
 
@@ -128,8 +129,34 @@ def main():
         cfg.model, train_cfg=cfg.train_cfg, test_cfg=cfg.test_cfg)
 
     datasets = [build_dataset(cfg.data.train)]
+    if len(cfg.workflow) == 2:
+        val_dataset = copy.deepcopy(cfg.data.val)
+        val_dataset.pipeline = cfg.data.train.pipeline
+        datasets.append(build_dataset(val_dataset))
+    if cfg.checkpoint_config is not None:
+        # save version, config file content and class names in
+        # checkpoints as meta data
+        cfg.checkpoint_config.meta = dict(
+            config=cfg.text,
+        )
 
-    
+        # meta information
+    meta = dict()
+    if cfg.get('exp_name', None) is None:
+        cfg['exp_name'] = osp.splitext(osp.basename(cfg.work_dir))[0]
+    meta['exp_name'] = cfg.exp_name
+    meta['seed'] = seed
+    meta['env_info'] = env_info
+
+    # add an attribute for visualization convenience
+    train_model(
+        model,
+        datasets,
+        cfg,
+        distributed=distributed,
+        validate=(not args.no_validate),
+        timestamp=timestamp,
+        meta=meta)
 
 if __name__ == '__main__':
     main()

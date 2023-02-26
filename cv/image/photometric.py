@@ -217,7 +217,7 @@ def adjust_contrast(img, factor=1.):
 
     Args:
         img (ndarray): Image to be contrasted. BGR order.
-        factor (float): Same as :func:`mmcv.adjust_brightness`.
+        factor (float): Same as :func:`cv.adjust_brightness`.
 
     Returns:
         ndarray: The contrasted image.
@@ -304,7 +304,7 @@ def adjust_sharpness(img, factor=1., kernel=None):
 
     Args:
         img (ndarray): Image to be sharpened. BGR order.
-        factor (float): Same as :func:`mmcv.adjust_brightness`.
+        factor (float): Same as :func:`cv.adjust_brightness`.
         kernel (np.ndarray, optional): Filter kernel to be applied on the img
             to obtain the degenerated img. Defaults to None.
 

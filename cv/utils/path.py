@@ -2,12 +2,12 @@ import os
 import os.path as osp
 from pathlib import Path
 
-from .misc import is_str
 
+def is_str(x):
+    return isinstance(x, str)
 
 def is_filepath(x):
     return is_str(x) or isinstance(x, Path)
-
 
 def fopen(filepath, *args, **kwargs):
     if is_str(filepath):

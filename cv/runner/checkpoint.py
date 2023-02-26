@@ -12,7 +12,7 @@ from importlib import import_module
 from torch.optim import Optimizer
 
 from ..parallel import is_module_wrapper
-from ..utils import load_url, digit_version, print_log
+from ..utils import load_url, digit_version, print_log, byte_stream_put
 from .dist_utils import get_dist_info
 
 
@@ -500,3 +500,4 @@ def save_checkpoint(model,
 
     with io.BytesIO() as f:
         torch.save(checkpoint, f)
+        byte_stream_put(f.getvalue(), filename)

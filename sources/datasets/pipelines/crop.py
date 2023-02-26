@@ -7,10 +7,10 @@ from ..registry import PIPELINES
 class PairedRandomCrop:
     """Paried random crop.
 
-    It crops a pair of lq and gt images with corresponding locations.
-    It also supports accepting lq list and gt list.
-    Required keys are "scale", "lq", and "gt",
-    added or modified keys are "lq" and "gt".
+    It crops a pair of input and gt images with corresponding locations.
+    It also supports accepting input list and gt list.
+    Required keys are "input", and "gt",
+    added or modified keys are "input" and "gt".
 
     Args:
         gt_patch_size (int): cropped gt patch size.
@@ -29,46 +29,44 @@ class PairedRandomCrop:
         Returns:
             dict: A dict containing the processed data and information.
         """
-        scale = results['scale']
-        lq_patch_size = self.gt_patch_size // scale
+        input_patch_size = self.gt_patch_size
 
-        lq_is_list = isinstance(results['lq'], list)
-        if not lq_is_list:
-            results['lq'] = [results['lq']]
+        input_is_list = isinstance(results['input'], list)
+        if not input_is_list:
+            results['input'] = [results['input']]
         gt_is_list = isinstance(results['gt'], list)
         if not gt_is_list:
             results['gt'] = [results['gt']]
 
-        h_lq, w_lq, _ = results['lq'][0].shape
+        h_input, w_input, _ = results['input'][0].shape
         h_gt, w_gt, _ = results['gt'][0].shape
 
-        if h_gt != h_lq * scale or w_gt != w_lq * scale:
+        if h_gt != h_input or w_gt != w_input:
             raise ValueError(
-                f'Scale mismatches. GT ({h_gt}, {w_gt}) is not {scale}x '
-                f'multiplication of LQ ({h_lq}, {w_lq}).')
-        if h_lq < lq_patch_size or w_lq < lq_patch_size:
+                f'mismatches. GT ({h_gt}, {w_gt})')
+        if h_input < input_patch_size or w_input < input_patch_size:
             raise ValueError(
-                f'LQ ({h_lq}, {w_lq}) is smaller than patch size '
-                f'({lq_patch_size}, {lq_patch_size}). Please check '
-                f'{results["lq_path"][0]} and {results["gt_path"][0]}.')
+                f'input ({h_input}, {w_input}) is smaller than patch size '
+                f'({input_patch_size}, {input_patch_size}). Please check '
+                f'{results["input_path"][0]} and {results["gt_path"][0]}.')
 
-        # randomly choose top and left coordinates for lq patch
-        top = np.random.randint(h_lq - lq_patch_size + 1)
-        left = np.random.randint(w_lq - lq_patch_size + 1)
-        # crop lq patch
-        results['lq'] = [
-            v[top:top + lq_patch_size, left:left + lq_patch_size, ...]
-            for v in results['lq']
+        # randomly choose top and left coordinates for input patch
+        top = np.random.randint(h_input - input_patch_size + 1)
+        left = np.random.randint(w_input - input_patch_size + 1)
+        # crop input patch
+        results['input'] = [
+            v[top:top + input_patch_size, left:left + input_patch_size, ...]
+            for v in results['input']
         ]
         # crop corresponding gt patch
-        top_gt, left_gt = int(top * scale), int(left * scale)
+        top_gt, left_gt = int(top), int(left)
         results['gt'] = [
             v[top_gt:top_gt + self.gt_patch_size,
               left_gt:left_gt + self.gt_patch_size, ...] for v in results['gt']
         ]
 
-        if not lq_is_list:
-            results['lq'] = results['lq'][0]
+        if not input_is_list:
+            results['input'] = results['input'][0]
         if not gt_is_list:
             results['gt'] = results['gt'][0]
         return results

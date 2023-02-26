@@ -67,8 +67,8 @@ data = dict(
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        root=r'D:\Program_self\Datasets\UIEB',
-        prefix=dict(img='raw-890', gt='reference-890'),
+        root=r'E:\dataset\uw_test\Test-R90',
+        prefix=dict(img='raw', gt='ref'),
         pipeline=val_pipeline),
     test=dict(
         type=dataset_type,
@@ -93,6 +93,8 @@ log_config = dict(
         dict(type='TextLoggerHook', by_epoch=False),
         # dict(type='WandbLoggerHook', init_kwargs=dict(project='wb')),
     ])
+
+lr_config = dict(policy='Fixed', by_epoch=False)
 
 visual_config = None
 

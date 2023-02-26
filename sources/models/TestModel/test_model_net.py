@@ -21,6 +21,7 @@ class TestNet(nn.Module):
             out_channels=36,
             kernel_size=kernel_size,
             stride=1,
+            padding=kernel_size//2,
             act_cfg=act_cfg,
             norm_cfg=dict(type='GN', num_groups=3)
         )
@@ -29,6 +30,7 @@ class TestNet(nn.Module):
             out_channels=out_channels,
             kernel_size=kernel_size,
             stride=1,
+            padding=kernel_size//2,
             act_cfg=act_cfg,
             norm_cfg=None
         )
