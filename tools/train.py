@@ -11,6 +11,7 @@ from cv.runner import init_dist
 from sources.utils import setup_multi_processes
 from sources.apis import init_random_seed, set_random_seed
 from sources.models import build_model
+from sources.datasets import build_dataset
 
 
 def parse_args():
@@ -126,7 +127,9 @@ def main():
     model = build_model(
         cfg.model, train_cfg=cfg.train_cfg, test_cfg=cfg.test_cfg)
 
-    print(model)
+    datasets = [build_dataset(cfg.data.train)]
+
+    
 
 if __name__ == '__main__':
     main()

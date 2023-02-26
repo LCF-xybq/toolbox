@@ -4,8 +4,8 @@ import os.path as osp
 from ..base import BaseModel
 from ..registry import MODELS
 from ..builder import build_loss, build_component
-from sources.core import tensor2img, imwrite, mse, psnr, ssim
-
+from sources.core import mse, psnr, ssim
+from cv.image import imwrite, tensor2imgs
 
 @MODELS.register_module()
 class Test(BaseModel):
@@ -55,8 +55,8 @@ class Test(BaseModel):
 
     def evaluate(self, output, gt):
         crop_border = self.test_cfg.crop_border
-        output = tensor2img(output)
-        gt = tensor2img(gt)
+        output = tensor2imgs(output)
+        gt = tensor2imgs(gt)
 
         eval_result = dict()
         for metric in self.test_cfg.metrics:
@@ -86,7 +86,7 @@ class Test(BaseModel):
             else:
                 raise ValueError('iteration should be number or None, '
                                  f'but got {type(iteration)}')
-            imwrite(tensor2img(output), save_path)
+            imwrite(tensor2imgs(output), save_path)
 
         return results
 

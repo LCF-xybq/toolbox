@@ -1,17 +1,10 @@
-import cv2
 import math
 import torch
 import numpy as np
-import os.path as osp
 
-from cv.utils import is_str
-from pathlib import Path
 from torchvision.utils import make_grid
 
-def is_filepath(x):
-    return is_str(x) or isinstance(x, Path)
-
-def tensor2img(tensor, out_type=np.uint8, min_max=(0, 1)):
+def tensor2imgs(tensor, out_type=np.uint8, min_max=(0, 1)):
     """Convert torch Tensors into image numpy arrays.
 
     After clamping to (min, max), image values will be normalized to [0, 1].
@@ -77,34 +70,3 @@ def tensor2img(tensor, out_type=np.uint8, min_max=(0, 1)):
         result.append(img_np)
     result = result[0] if len(result) == 1 else result
     return result
-
-def imwrite(img,
-            file_path,
-            params=None):
-    """Write image to file.
-
-    Note:
-        In v1.4.1 and later, add `file_client_args` parameters.
-
-    Warning:
-        The parameter `auto_mkdir` will be deprecated in the future and every
-        file clients will make directory automatically.
-
-    Args:
-        img (ndarray): Image array to be written.
-        file_path (str): Image file path.
-        params (None or list): Same as opencv :func:`imwrite` interface.
-        auto_mkdir (bool): If the parent folder of `file_path` does not exist,
-            whether to create it automatically. It will be deprecated.
-
-    Returns:
-        bool: Successful or not.
-    """
-    assert is_filepath(file_path)
-    file_path = str(file_path)
-    img_ext = osp.splitext(file_path)[-1]
-    # Encode image according to image suffix.
-    # For example, if image path is '/path/your/img.jpg', the encode
-    # format is '.jpg'.
-    flag, img_buff = cv2.imencode(img_ext, img, params)
-    return flag

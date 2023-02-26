@@ -21,56 +21,39 @@ train_cfg = None
 test_cfg = None
 
 # dataset settings
-train_dataset_type = 'TripleDataset'
-val_dataset_type = 'TripleDataset'
-test_dataset_type = 'SRFolderLRDataset'
+dataset_type = 'PairedImageDataset'
 
 train_pipeline = [
     dict(
         type='LoadImageFromFile',
-        io_backend='disk',
-        key='lq',
-        flag='unchanged'),
+        key='input',
+        channel_order='rgb'),
     dict(
         type='LoadImageFromFile',
-        io_backend='disk',
         key='gt',
-        flag='unchanged'),
-    dict(type='RescaleToZeroOne', keys=['lq', 'gt']),
-    dict(type='PairedRandomCrop', gt_patch_size=320),
+        channel_order='rgb'),
+    dict(type='Resize', scale=(280, 280),keys=['input', 'gt']),
+    dict(type='PairedRandomCrop', gt_patch_size=256),
     dict(
-        type='Flip', keys=['lq', 'gt'], flip_ratio=0.5,
+        type='Flip', keys=['input', 'gt'], flip_ratio=0.5,
         direction='horizontal'),
-    dict(type='Collect', keys=['lq', 'gt'], meta_keys=['lq_path', 'gt_path']),
-    dict(type='ImageToTensor', keys=['lq', 'gt'])
+    dict(type='Collect', keys=['input', 'gt'], meta_keys=['input_path', 'gt_path']),
+    dict(type='ImageToTensor', keys=['input', 'gt'])
 ]
 
 val_pipeline = [
     dict(
         type='LoadImageFromFile',
-        io_backend='disk',
-        key='lq',
-        flag='unchanged'),
+        key='input',
+        channel_order='rgb'),
     dict(
         type='LoadImageFromFile',
-        io_backend='disk',
         key='gt',
-        flag='unchanged'),
-    dict(type='RescaleToZeroOne', keys=['lq', 'gt']),
-    dict(type='Collect', keys=['lq', 'gt'], meta_keys=['lq_path', 'gt_path']),
-    dict(type='ImageToTensor', keys=['lq', 'gt'])
+        channel_order='rgb'),
+    dict(type='Collect', keys=['input', 'gt'], meta_keys=['input_path', 'gt_path']),
+    dict(type='ImageToTensor', keys=['input', 'gt'])
 ]
 
-test_pipeline = [
-    dict(
-        type='LoadImageFromFile',
-        io_backend='disk',
-        key='lq',
-        flag='unchanged'),
-    dict(type='RescaleToZeroOne', keys=['lq']),
-    dict(type='Collect', keys=['lq'], meta_keys=['lq_path']),
-    dict(type='ImageToTensor', keys=['lq'])
-]
 
 data = dict(
     workers_per_gpu=4,
@@ -78,47 +61,39 @@ data = dict(
     val_dataloader=dict(samples_per_gpu=1),
     test_dataloader=dict(samples_per_gpu=1),
     train=dict(
-        type=train_dataset_type,
-        lq_folder='/datafile/lcf2021/uw_train/input_train',
-        gt_folder='/datafile/lcf2021/uw_train/gt_train',
-        pipeline=train_pipeline,
-        scale=1,
-        filename_tmpl='{}'),
+        type=dataset_type,
+        root=r'D:\Program_self\Datasets\UIEB',
+        prefix=dict(img='raw-890', gt='reference-890'),
+        pipeline=train_pipeline),
     val=dict(
-        type=val_dataset_type,
-        lq_folder='/datafile/lcf2021/uw_test/Test-R90/raw',
-        gt_folder='/datafile/lcf2021/uw_test/Test-R90/ref',
-        pipeline=val_pipeline,
-        scale=1,
-        filename_tmpl='{}'),
+        type=dataset_type,
+        root=r'D:\Program_self\Datasets\UIEB',
+        prefix=dict(img='raw-890', gt='reference-890'),
+        pipeline=val_pipeline),
     test=dict(
-        type=test_dataset_type,
-        lq_folder='/datafile/lcf2021/uw_test/Test-C60',
-        pipeline=test_pipeline,
-        scale=1,
-        filename_tmpl='{}'))
+        type=dataset_type,
+        root=r'D:\Program_self\Datasets\UIEB',
+        prefix=dict(img='challenging-60', gt='challenging-60'),
+        pipeline=val_pipeline)
+)
 
 # optimizer
 optimizers = dict(type='Adam', lr=1e-3, betas=(0.9, 0.999))
 
 # learning policy
-total_iters = 100000
-lr_config = dict(
-    policy='Step',
-    by_epoch=False,
-    step=[50000],
-    gamma=0.5)
+total_iters = 100
 
-checkpoint_config = dict(interval=5000, save_optimizer=True, by_epoch=False)
+checkpoint_config = dict(interval=5, save_optimizer=True, by_epoch=False)
 # 'no dist' do not have 'gpu_collect'
 # 'dist' do
-evaluation = dict(interval=500, save_image=True)
+evaluation = dict(interval=5, save_image=True)
 log_config = dict(
-    interval=10,
+    interval=1,
     hooks=[
         dict(type='TextLoggerHook', by_epoch=False),
         # dict(type='WandbLoggerHook', init_kwargs=dict(project='wb')),
     ])
+
 visual_config = None
 
 # runtime settings
