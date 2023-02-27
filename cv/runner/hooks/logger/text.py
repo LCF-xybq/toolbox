@@ -64,7 +64,6 @@ class TextLoggerHook(LoggerHook):
             raise TypeError('out_dir should be  "None" or string or tuple of '
                             'string, but got {out_dir}')
         self.out_suffix = out_suffix
-
         self.keep_local = keep_local
 
     def before_run(self, runner):

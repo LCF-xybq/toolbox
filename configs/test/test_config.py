@@ -6,19 +6,19 @@ model = dict(
         type='TestNet'
     ),
     mse_loss=dict(type='MSELoss', loss_weight=1.0),
-    perc_loss=dict(
-        type='PerceptualLoss',
-        layer_weights={'34': 1.0},
-        vgg_type='vgg19',
-        perceptual_weight=0.1,
-        style_weight=0,
-        norm_img=False
-    )
+    # perc_loss=dict(
+    #     type='PerceptualLoss',
+    #     layer_weights={'34': 1.0},
+    #     vgg_type='vgg19',
+    #     perceptual_weight=0.1,
+    #     style_weight=0,
+    #     norm_img=False
+    # )
 )
 
 # model training and testing settings
 train_cfg = None
-test_cfg = None
+test_cfg = dict(metrics=['PSNR', 'SSIM'], crop_border=0)
 
 # dataset settings
 dataset_type = 'PairedImageDataset'
@@ -62,18 +62,18 @@ data = dict(
     test_dataloader=dict(samples_per_gpu=1),
     train=dict(
         type=dataset_type,
-        root=r'D:\Program_self\Datasets\UIEB',
-        prefix=dict(img='raw-890', gt='reference-890'),
+        root='/datafile/lcf2022/uw_dataset_uieb_synth_basic/train',
+        prefix=dict(img='lr', gt='gt'),
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        root=r'E:\dataset\uw_test\Test-R90',
+        root='/datafile/lcf2022/uw_test/Test-R90',
         prefix=dict(img='raw', gt='ref'),
         pipeline=val_pipeline),
     test=dict(
         type=dataset_type,
-        root=r'D:\Program_self\Datasets\UIEB',
-        prefix=dict(img='challenging-60', gt='challenging-60'),
+        root='/datafile/lcf2022/uw_test/Test-R90',
+        prefix=dict(img='raw', gt='ref'),
         pipeline=val_pipeline)
 )
 
@@ -83,10 +83,10 @@ optimizers = dict(type='Adam', lr=1e-3, betas=(0.9, 0.999))
 # learning policy
 total_iters = 100
 
-checkpoint_config = dict(interval=5, save_optimizer=True, by_epoch=False)
+checkpoint_config = dict(interval=20, save_optimizer=True, by_epoch=False)
 # 'no dist' do not have 'gpu_collect'
 # 'dist' do
-evaluation = dict(interval=5, save_image=True)
+evaluation = dict(interval=20, save_image=True)
 log_config = dict(
     interval=1,
     hooks=[

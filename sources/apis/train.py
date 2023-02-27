@@ -82,7 +82,7 @@ def train_model(model,
         meta (dict | None): Meta dict to record some important information.
             Default: None
     """
-    logger = get_logger(name='train_model', log_level=cfg.log_level)
+    logger = get_logger(cfg.exp_name, log_level=cfg.log_level)
 
     # start training
     if distributed:
