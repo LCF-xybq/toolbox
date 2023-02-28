@@ -2,10 +2,12 @@
 __pycache__/
 *.py[cod]
 *$py.class
-**/*.pyc
 
 # C extensions
 *.so
+
+# PyTorch checkpoint
+*.pth
 
 # Distribution / packaging
 .Python
@@ -66,10 +68,7 @@ instance/
 
 # Sphinx documentation
 docs/en/_build/
-docs/en/_tmp/
 docs/zh_cn/_build/
-docs/zh_cn/_tmp/
-requirements/src/
 
 # PyBuilder
 target/
@@ -108,35 +107,24 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# editors and IDEs
+.idea/
+.vscode/
+
 # custom
-.vscode
-.idea
-*.pkl
-*.pkl.json
-*.log.json
-work_dirs/
-work_dirs
-configs_ceph/
-configs_ceph_*/
-/data/
-/data
-sources/.mim
-demo/*.png
-*.csv
-out/*.png
-
-# Pytorch
-*.pth
-
-# onnx and tensorrt
-*.onnx
-*.trt
-
-# local history
-.history/**
-
-# Pytorch Server
-*.mar
-
-# MacOS
 .DS_Store
+
+# datasets and logs and checkpoints
+data/
+work_dir/
+
+src/
+
+mmcv/
+
+*.json
+*.pickle
+*.pkl
+*.yaml
+*.yml
+*.xxx
